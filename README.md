@@ -1,4 +1,4 @@
-# Supply Allocation Optimizer 🌾
+# Supply Allocation Optimizer 
 
 LP-based tool for agri-food consortia to optimally allocate sales flows across producers, buyers, and products.
 
