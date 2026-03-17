@@ -1,11 +1,3 @@
-"""
-app.py  –  run with:  streamlit run app.py
-
-CSV attesi
-  a.csv  →  colonne: j, r, value      (inventario atteso)
-  b.csv  →  colonne: i, r, value      (produzione attesa)
-"""
-
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -15,7 +7,6 @@ from itertools import product
 # ── Solver ────────────────────────────────────────────────────────────────────
 
 def solve(a: dict, b: dict, lam: float = 0.1):
-    """Ritorna x[(i,j,r)] ottimale, status e valore obiettivo."""
     I = sorted({i for i, _ in b})
     J = sorted({j for j, _ in a})
     R = sorted({r for _, r in a})
@@ -78,15 +69,15 @@ def slice_df(x, I, J, R, dim, val):
 # ── UI ────────────────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="Supply Optimizer", layout="wide")
-st.title("🌾 Supply Allocation Optimizer")
+st.title("Supply Allocation Optimizer")
 
 col1, col2 = st.columns(2)
 with col1:
-    fa = st.file_uploader("a.csv — inventario (j, r, value)", type="csv")
+    fa = st.file_uploader("inventory.csv (j, r, value)", type="csv")
 with col2:
-    fb = st.file_uploader("b.csv — produzione (i, r, value)", type="csv")
+    fb = st.file_uploader("production.csv (i, r, value)", type="csv")
 
-lam = st.slider("λ sparsità", 0.0, 1.0, 0.1, 0.05)
+lam = st.slider("λ sparsity coefficient", 0.0, 1.0, 0.1, 0.05)
 
 if fa and fb:
     a_df = pd.read_csv(fa)
@@ -94,28 +85,28 @@ if fa and fb:
     a = {(row.j, row.r): row.value for _, row in a_df.iterrows()}
     b = {(row.i, row.r): row.value for _, row in b_df.iterrows()}
 
-    if st.button("▶ Ottimizza"):
+    if st.button("▶ Optimize"):
         with st.spinner("Solving..."):
             x, msg, obj, I, J, R = solve(a, b, lam)
 
-        st.success(f"{msg}  |  Obiettivo: {obj:.4f}")
+        st.success(f"{msg}  |  Objective: {obj:.4f}")
 
-        st.subheader("Matrice i-j per ogni r")
+        st.subheader("Matrices i-j for each r")
         for r in R:
             st.markdown(f"### r = {r}")
             data = [[x.get((i, j, r), 0) for j in J] for i in I]
             df = pd.DataFrame(data, index=[f"i={i}" for i in I], columns=[f"j={j}" for j in J])
             st.dataframe(df.style.background_gradient(cmap="YlGn", axis=None))
 
-        st.subheader("Tutti i flussi x_ijr > 0")
+        st.subheader("All goods flows x_ijr > 0")
         rows = [{"i": i, "j": j, "r": r, "x": v}
                 for (i, j, r), v in x.items() if v > 1e-6]
         if rows:
             st.dataframe(pd.DataFrame(rows))
         else:
-            st.info("Nessun flusso positivo.")
+            st.info("No positive flow.")
 else:
-    st.info("Carica entrambi i CSV per procedere.")
-    with st.expander("Formato CSV atteso"):
+    st.info("Upload both csv files to continue.")
+    with st.expander("Expected CSV format"):
         st.code("# a.csv\nj,r,value\n0,0,12\n0,1,8\n1,0,10\n...", language="csv")
         st.code("# b.csv\ni,r,value\n0,0,15\n0,1,9\n1,0,11\n...", language="csv")
