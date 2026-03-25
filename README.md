@@ -47,4 +47,4 @@ Sample files included in `/data`.
 
 ## License
 
-MIT
+Apache 2.0
