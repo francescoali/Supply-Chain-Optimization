@@ -108,5 +108,5 @@ if fa and fb:
 else:
     st.info("Upload both csv files to continue.")
     with st.expander("Expected CSV format"):
-        st.code("# a.csv\nj,r,value\n0,0,12\n0,1,8\n1,0,10\n...", language="csv")
-        st.code("# b.csv\ni,r,value\n0,0,15\n0,1,9\n1,0,11\n...", language="csv")
+        st.code("# inventory.csv\nj,r,value\n0,0,12\n0,1,8\n1,0,10\n...", language="csv")
+        st.code("# production.csv\ni,r,value\n0,0,15\n0,1,9\n1,0,11\n...", language="csv")
